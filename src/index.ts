@@ -1,5 +1,8 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./conf/swagger";
+import orderRoutes from "./routes/orderRoutes";
 
 dotenv.config();
 
@@ -13,3 +16,6 @@ app.get("/", (req: Request, res: Response) => {
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api', orderRoutes);
