@@ -1,0 +1,1 @@
+export type DeliveryStatusType = 'pending' | 'assigned' | 'in-transit' | 'delivered';
