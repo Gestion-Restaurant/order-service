@@ -13,6 +13,7 @@ export const getAllOrders = async (req: Request, res: Response): Promise<void> =
     } catch (error) {
         res.status(500).json({
             message: 'Erreur serveur',
+            error
         });
     }
 }
@@ -34,9 +35,33 @@ export const getOrderById = async (req: Request, res: Response): Promise<void> =
     } catch (error) {
         res.status(500).json({
             message: 'Erreur serveur',
+            error
         });
     }
 };
+
+export const getOrdersByClientId = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { clientId } = req.params;
+        const orders: IOrder[] = await Order.find
+            ({ clientId });
+        if (!orders) {
+            res.status(404).json({
+                message: 'Commandes non trouvées',
+            });
+            return;
+        }
+        res.status(200).json({
+            message: 'Commandes récupérées avec succès',
+            data: orders,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Erreur serveur',
+            error
+        });
+    }
+}
 
 export const createOrder = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -49,6 +74,7 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
     } catch (error) {
         res.status(500).json({
             message: 'Erreur serveur',
+            error,
         });
     }
 }
@@ -74,6 +100,7 @@ export const updateOrder = async (req: Request, res: Response): Promise<void> =>
     } catch (error) {
         res.status(500).json({
             message: 'Erreur serveur',
+            error
         });
     }
 }
@@ -108,6 +135,7 @@ export const updateStatus = async (req: Request, res: Response): Promise<void> =
     } catch (error) {
         res.status(500).json({
             message: 'Erreur serveur',
+            error
         });
     }
 }
@@ -128,6 +156,7 @@ export const deleteOrder = async (req: Request, res: Response): Promise<void> =>
     } catch (error) {
         res.status(500).json({
             message: 'Erreur serveur',
+            error
         });
     }
 }

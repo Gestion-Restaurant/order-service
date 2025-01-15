@@ -4,6 +4,7 @@ import {
     deleteOrder,
     getAllOrders,
     getOrderById,
+    getOrdersByClientId,
     updateOrder,
     updateStatus
 } from '../controllers/orderController';
@@ -28,7 +29,7 @@ const router = express.Router();
  *       500:
  *         description: Erreur serveur
  */
-router.get('/orders', getAllOrders);
+router.get('/Orders', getAllOrders);
 
 /**
  * @swagger
@@ -55,7 +56,36 @@ router.get('/orders', getAllOrders);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/orders/:id', getOrderById);
+router.get('/Orders/ById/:id', getOrderById);
+
+/**
+ * @swagger
+ * /api/orders/client/{clientId}:
+ *   get:
+ *     summary: Récupère les commandes d'un client
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: clientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du client
+ *     responses:
+ *       200:
+ *         description: Liste des commandes récupérée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Order'
+ *       404:
+ *         description: Commandes non trouvées
+ *       500:
+ *         description: Erreur serveur
+ */
+router.get('/Orders/ByIdClient/:clientId', getOrdersByClientId);
 
 /**
  * @swagger
@@ -79,7 +109,7 @@ router.get('/orders/:id', getOrderById);
  *       500:
  *         description: Erreur serveur
  */
-router.post('/orders', createOrder);
+router.post('/Orders', createOrder);
 
 /**
  * @swagger
@@ -112,7 +142,7 @@ router.post('/orders', createOrder);
  *       500:
  *         description: Erreur serveur
  */
-router.put('/orders/:id', updateOrder);
+router.put('/Orders/:id', updateOrder);
 
 /**
  * @swagger
@@ -152,7 +182,7 @@ router.put('/orders/:id', updateOrder);
  *       500:
  *         description: Erreur serveur
  */
-router.patch('/orders/:id', updateStatus);
+router.patch('/Orders/:id', updateStatus);
 
 /**
  * @swagger
@@ -175,6 +205,6 @@ router.patch('/orders/:id', updateStatus);
  *       500:
  *         description: Erreur serveur
  */
-router.delete('/orders/:id', deleteOrder);
+router.delete('/Orders/:id', deleteOrder);
 
 export default router;
