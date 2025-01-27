@@ -1,15 +1,47 @@
-import mongoose, { Schema } from 'mongoose';
-import IOrder from '../interfaces/orderInterface';
+import mongoose from 'mongoose';
+import IOrder from '../interfaces/IOrder';
+import {DeliveryStatus} from "../enums/deliveryStatusEnum";
 
-const OrderSchema: Schema = new Schema({
-    clientId: { type: mongoose.Types.ObjectId, ref: 'Client', required: true },
+const orderSchema = new mongoose.Schema({
+    clientId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    restaurantId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
     items: [{
-        dishId: { type: mongoose.Types.ObjectId, ref: 'Dish', required: true },
-        quantity: { type: Number, required: true }
+        itemId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true,
+            min: 1
+        },
+        price: {
+            type: Number,
+            required: true,
+            min: 0
+        }
     }],
-    status: { type: String, enum: ['pending', 'in_kitchen', 'ready_for_delivery', 'delivered'], default: 'pending' },
-    totalAmount: { type: Number, required: true },
-    createdAt: { type: Date, default: Date.now }
+    status: {
+        type: String,
+        enum: Object.values(DeliveryStatus),
+        default: DeliveryStatus.PENDING
+    },
+    totalAmount: {
+        type: Number,
+        required: true
+    },
+}, {
+    timestamps: true
 });
 
-export default mongoose.model<IOrder>('Order', OrderSchema);
+export default mongoose.model<IOrder>('Order', orderSchema);

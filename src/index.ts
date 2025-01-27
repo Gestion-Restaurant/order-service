@@ -5,6 +5,7 @@ import swaggerSpec from "./conf/swagger";
 import orderRoutes from "./routes/orderRoutes";
 import cors from "cors";
 import { mongooseConnect } from "./middleware/DBMiddleware";
+import { config } from "./conf/config";
 
 var corsOptions = {
 };
@@ -12,7 +13,7 @@ var corsOptions = {
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
+const port = config.port;
 
 mongooseConnect();
 

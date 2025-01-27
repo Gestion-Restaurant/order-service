@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import IDish from '../interfaces/dishInterface';
+import IDish from '../interfaces/IDish';
 
 const DishSchema: Schema = new Schema({
     name: { type: String, required: true },

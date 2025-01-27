@@ -1,12 +1,12 @@
 import express from 'express';
 import {
     createOrder,
-    deleteOrder,
+    deleteOrderById,
     getAllOrders,
     getOrderById,
     getOrdersByClientId,
-    updateOrder,
-    updateStatus
+    updateOrderById,
+    updateStatusById
 } from '../controllers/orderController';
 
 const router = express.Router();
@@ -142,7 +142,7 @@ router.post('/Orders', createOrder);
  *       500:
  *         description: Erreur serveur
  */
-router.put('/Orders/:id', updateOrder);
+router.put('/Orders/ById/:id', updateOrderById);
 
 /**
  * @swagger
@@ -182,7 +182,7 @@ router.put('/Orders/:id', updateOrder);
  *       500:
  *         description: Erreur serveur
  */
-router.patch('/Orders/:id', updateStatus);
+router.patch('/Orders/ById/:id', updateStatusById);
 
 /**
  * @swagger
@@ -205,6 +205,6 @@ router.patch('/Orders/:id', updateStatus);
  *       500:
  *         description: Erreur serveur
  */
-router.delete('/Orders/:id', deleteOrder);
+router.delete('/Orders/ById/:id', deleteOrderById);
 
 export default router;

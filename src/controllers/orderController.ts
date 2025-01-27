@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
-import IOrder from "../interfaces/orderInterface";
+import IOrder from "../interfaces/IOrder";
 import Order from "../models/orderSchema";
 import {DeliveryStatus} from "../enums/deliveryStatusEnum";
+import {config} from "../conf/config";
+import axios from 'axios';
 
 export const getAllOrders = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -79,7 +81,7 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
     }
 }
 
-export const updateOrder = async (req: Request, res: Response): Promise<void> => {
+export const updateOrderById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
         const updatedOrder: IOrder | null = await Order.findByIdAndUpdate(
@@ -105,22 +107,23 @@ export const updateOrder = async (req: Request, res: Response): Promise<void> =>
     }
 }
 
-export const updateStatus = async (req: Request, res: Response): Promise<void> => {
+export const updateStatusById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
         const { status } = req.body;
+
+        if (!Object.values(DeliveryStatus).includes(status)) {
+            res.status(400).json({
+                message: 'Statut invalide',
+            });
+            return;
+        }
+
         const updatedOrder: IOrder | null = await Order.findByIdAndUpdate(
             { _id: id },
             { status },
             { new: true }
         );
-
-        if (!Object.values(DeliveryStatus).includes(status)) {
-            res.status(400).json({
-                message: `Statut invalide.}`,
-            });
-            return;
-        }
 
         if (!updatedOrder) {
             res.status(404).json({
@@ -128,19 +131,62 @@ export const updateStatus = async (req: Request, res: Response): Promise<void> =
             });
             return;
         }
+
+        try {
+            switch (status) {
+                case DeliveryStatus.IN_KITCHEN:
+                    await axios.post(`${config.kitchenServiceUrl}`, {
+                        orderId: id,
+                        items: updatedOrder.items,
+                        restaurantId: updatedOrder.restaurantId,
+                        clientId: updatedOrder.clientId
+                    });
+                    //TODO A FAIRE AXEL
+                    break;
+                case DeliveryStatus.READY_FOR_DELIVERY:
+                    await axios.post(`${config.deliveryServiceUrl}`, {
+                        orderId: id,
+                        items: updatedOrder.items,
+                        restaurantId: updatedOrder.restaurantId,
+                        clientId: updatedOrder.clientId
+                    });
+                    //TODO A FAIRE NOUREDDINE
+                    break;
+                case DeliveryStatus.IN_TRANSIT:
+                    await axios.post(`${config.customerServiceUrl}`, {
+                        orderId: id,
+                        items: updatedOrder.items,
+                        restaurantId: updatedOrder.restaurantId,
+                        clientId: updatedOrder.clientId
+                    });
+                    break;
+                case DeliveryStatus.DELIVERED:
+                    await axios.post(`${config.customerServiceUrl}`, {
+                        orderId: id,
+                        items: updatedOrder.items,
+                        restaurantId: updatedOrder.restaurantId,
+                        clientId: updatedOrder.clientId
+                    });
+                    break;
+            }
+        } catch (error) {
+            console.error('Erreur lors de la notification:', error);
+        }
+
         res.status(200).json({
             message: 'Statut de la commande mis à jour avec succès',
             data: updatedOrder,
         });
+
     } catch (error) {
         res.status(500).json({
             message: 'Erreur serveur',
             error
         });
     }
-}
+};
 
-export const deleteOrder = async (req: Request, res: Response): Promise<void> => {
+export const deleteOrderById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
         const deletedOrder: IOrder | null = await Order.findByIdAndDelete(id);
@@ -160,3 +206,4 @@ export const deleteOrder = async (req: Request, res: Response): Promise<void> =>
         });
     }
 }
+
