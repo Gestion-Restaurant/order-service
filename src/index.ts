@@ -2,13 +2,10 @@ import express, { Express } from "express";
 import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./conf/swagger";
-import orderRoutes from "./routes/orderRoutes";
+import orderRoutes from "./routes/order.routes";
 import cors from "cors";
 import { mongooseConnect } from "./middleware/DBMiddleware";
 import { config } from "./conf/config";
-
-var corsOptions = {
-};
 
 dotenv.config();
 
@@ -18,7 +15,6 @@ const port = config.port;
 mongooseConnect();
 
 app.use(express.json());
-app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', orderRoutes);
