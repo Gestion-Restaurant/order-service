@@ -7,7 +7,7 @@ import {
     getOrdersByClientId,
     updateOrderById,
     updateStatusById
-} from '../controllers/orderController';
+} from '../controllers/order.controller';
 
 const router = express.Router();
 
@@ -29,7 +29,9 @@ const router = express.Router();
  *       500:
  *         description: Erreur serveur
  */
-router.get('/Orders', getAllOrders);
+router.get('/', (req, res) => {
+    getAllOrders(req, res);
+});
 
 /**
  * @swagger
@@ -56,7 +58,9 @@ router.get('/Orders', getAllOrders);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/Orders/ById/:id', getOrderById);
+router.get('/ById/:id', (req, res) => {
+    getOrderById(req, res);
+});
 
 /**
  * @swagger
@@ -85,7 +89,9 @@ router.get('/Orders/ById/:id', getOrderById);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/Orders/ByIdClient/:clientId', getOrdersByClientId);
+router.get('/ByIdClient/:clientId', (req, res) => {
+    getOrdersByClientId(req, res);
+});
 
 /**
  * @swagger
@@ -109,7 +115,9 @@ router.get('/Orders/ByIdClient/:clientId', getOrdersByClientId);
  *       500:
  *         description: Erreur serveur
  */
-router.post('/Orders', createOrder);
+router.post('/', (req, res) => {
+    createOrder(req, res);
+});
 
 /**
  * @swagger
@@ -142,7 +150,9 @@ router.post('/Orders', createOrder);
  *       500:
  *         description: Erreur serveur
  */
-router.put('/Orders/ById/:id', updateOrderById);
+router.put('/ById/:id', (req, res) => {
+    updateOrderById(req, res);
+});
 
 /**
  * @swagger
@@ -182,7 +192,9 @@ router.put('/Orders/ById/:id', updateOrderById);
  *       500:
  *         description: Erreur serveur
  */
-router.patch('/Orders/ById/:id', updateStatusById);
+router.patch('/ById/:id', (req, res) => {
+    updateStatusById(req, res);
+});
 
 /**
  * @swagger
@@ -205,6 +217,8 @@ router.patch('/Orders/ById/:id', updateStatusById);
  *       500:
  *         description: Erreur serveur
  */
-router.delete('/Orders/ById/:id', deleteOrderById);
+router.delete('/ById/:id', (req, res) => {
+    deleteOrderById(req, res);
+});
 
 export default router;

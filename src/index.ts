@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./conf/swagger";
@@ -26,3 +26,5 @@ app.use('/api', orderRoutes);
 app.listen(port, () => {
   console.log(`⚡️ [server]: Server is running at http://localhost:${port}`);
 });
+
+app.use('/orders', orderRoutes);
