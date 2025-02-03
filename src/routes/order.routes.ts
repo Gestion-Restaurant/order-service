@@ -6,7 +6,8 @@ import {
     getOrderById,
     getOrdersByClientId,
     updateOrderById,
-    updateStatusById
+    updateStatusById,
+    getOrdersByRestaurantId
 } from '../controllers/order.controller';
 
 const router = express.Router();
@@ -219,6 +220,10 @@ router.patch('/ById/:id', (req, res) => {
  */
 router.delete('/ById/:id', (req, res) => {
     deleteOrderById(req, res);
+});
+
+router.get('/restaurant/:restaurantId', (req, res) => {
+    getOrdersByRestaurantId(req, res);
 });
 
 export default router;
