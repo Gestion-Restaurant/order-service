@@ -22,7 +22,50 @@ export const getAllOrders = async (req: Request, res: Response): Promise<Respons
             error
         });
     }
-}
+};
+
+export const getOrdersByRestaurantId = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { restaurantId } = req.params;
+        // get the orders that have the same restaurantId and the status DeliveryStatus.PENDING or in IN_KITCHEN
+        const ordersData = await Order.find({
+            restaurantId,
+            status: {
+                $in: [DeliveryStatus.PENDING, DeliveryStatus.IN_KITCHEN, DeliveryStatus.READY_FOR_DELIVERY, DeliveryStatus.ASSIGNED]
+            }
+        }).lean();
+        
+        const orders: IOrderCustomer[] = ordersData.map(order => ({
+            ...order,
+            customerName: ''
+        } as unknown as IOrderCustomer));
+
+        if (!orders) {
+            return res.status(404).json({
+                message: 'Commandes non trouvées',
+            });
+        }
+
+        for (const order of orders) {
+            const response = await axios.get(`${config.customerServiceUrl}/users/byId/${order.clientId.toString()}`);
+            if (response.status === 200) {
+                order.customerName = response.data.customer.name;
+            } else {
+                order.customerName = '';
+            }
+        }
+
+        return res.status(200).json({
+            message: 'Commandes récupérées avec succès',
+            data: orders,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Erreur serveur',
+            error
+        });
+    }
+};
 
 export const getOrderById = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -48,12 +91,29 @@ export const getOrderById = async (req: Request, res: Response): Promise<Respons
 export const getOrdersByClientId = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { clientId } = req.params;
-        const orders: IOrder[] = await Order.find({ clientId });
+        const ordersData: IOrder[] = await Order.find({ clientId, status: { $ne: DeliveryStatus.DELIVERED } }).lean();
+
+
+        const orders: IOrderCustomer[] = ordersData.map(order => ({
+            ...order,
+            customerName: ''
+        } as unknown as IOrderCustomer));
+
         if (!orders) {
             return res.status(404).json({
                 message: 'Commandes non trouvées',
             });
         }
+
+        for (const order of orders) {
+            const response = await axios.get(`${config.customerServiceUrl}/users/byId/${clientId}`);
+            if (response.status === 200) {
+                order.customerName = response.data.customer.name;
+            } else {
+                order.customerName = '';
+            }
+        }
+
         return res.status(200).json({
             message: 'Commandes récupérées avec succès',
             data: orders,
@@ -187,45 +247,3 @@ export const deleteOrderById = async (req: Request, res: Response): Promise<Resp
     }
 };
 
-export const getOrdersByRestaurantId = async (req: Request, res: Response): Promise<Response> => {
-    try {
-        const { restaurantId } = req.params;
-        // get the orders that have the same restaurantId and the status DeliveryStatus.PENDING or in IN_KITCHEN
-        const ordersData = await Order.find({
-            restaurantId,
-            status: {
-                $in: [DeliveryStatus.PENDING, DeliveryStatus.IN_KITCHEN, DeliveryStatus.READY_FOR_DELIVERY, DeliveryStatus.ASSIGNED]
-            }
-        }).lean();
-        
-        const orders: IOrderCustomer[] = ordersData.map(order => ({
-            ...order,
-            customerName: ''
-        } as unknown as IOrderCustomer));
-
-        if (!orders) {
-            return res.status(404).json({
-                message: 'Commandes non trouvées',
-            });
-        }
-
-        for (const order of orders) {
-            const response = await axios.get(`${config.customerServiceUrl}/users/byId/${order.clientId.toString()}`);
-            if (response.status === 200) {
-                order.customerName = response.data.customer.name;
-            } else {
-                order.customerName = '';
-            }
-        }
-
-        return res.status(200).json({
-            message: 'Commandes récupérées avec succès',
-            data: orders,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: 'Erreur serveur',
-            error
-        });
-    }
-};
